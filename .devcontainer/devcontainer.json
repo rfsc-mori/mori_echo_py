@@ -1,0 +1,43 @@
+{
+  "name": "mori_echo_py-devcontainer",
+
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "mori_echo_py-devcontainer",
+  "shutdownAction": "stopCompose",
+
+  "workspaceFolder": "/home/vscode/workspace/",
+  "postCreateCommand": ".devcontainer/postCreateCommand",
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
+    "ghcr.io/meaningful-ooo/devcontainer-features/fish:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "EditorConfig.EditorConfig",
+        "oderwat.indent-rainbow",
+        "ms-python.black-formatter"
+      ],
+
+      "settings": {
+        // Python:
+        // To update interpreter: > Python: Clear Workspace Interpreter Setting
+        "python.defaultInterpreterPath": "./.venv/bin/python",
+        "python.terminal.activateEnvInCurrentTerminal": true,
+
+        // Formatter:
+        "python.editor.defaultFormatter": "ms-python.black-formatter",
+
+        // Tests intellisense:
+        "python.analysis.extraPaths": ["./src"],
+
+        // Misc:
+        "editor.formatOnSave": true,
+        "terminal.integrated.defaultProfile.linux": "fish"
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test with python ${{ matrix.python }} (${{ matrix.platform }})
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        python: ["3.12"]
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Install test dependencies
+        run: |
+          poetry run pip install --upgrade pip setuptools
+          poetry install --with test --no-root
+      - name: Test
+        run: poetry run tox

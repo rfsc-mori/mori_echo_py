@@ -1,0 +1,25 @@
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  ruff:
+    name: Lint with Ruff and Python 3.12
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Install lint dependencies
+        run: |
+          poetry run pip install --upgrade pip setuptools
+          poetry install --only linter --no-root
+      - name: Lint
+        run: |
+          poetry run mypy .
+          poetry run ruff check .

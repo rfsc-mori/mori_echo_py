@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd /home/vscode/workspace
+
+python -m venv .venv
+. ./.venv/bin/activate
+
+pipx install poetry
+poetry run pip install --upgrade pip setuptools
+poetry install --no-root --with dev,test,linter

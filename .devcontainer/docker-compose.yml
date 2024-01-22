@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  mori_echo_py-devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - DEVCONTAINER_USER=$DEVCONTAINER_USER
+        - PYTHON_VERISON=$PYTHON_VERISON
+    user: $DEVCONTAINER_USER
+    init: true
+    command: sleep infinity
+    restart: "no"
+    volumes:
+      - ..:/home/$DEVCONTAINER_USER/workspace:cached
+      - $DEVCONTAINER_CONFIG_DIR/.fish/conf.d:/home/$DEVCONTAINER_USER/.config/fish/conf.d:ro
+      - fish_config:/home/$DEVCONTAINER_USER/.config/fish:rw
+      - fish_data:/home/$DEVCONTAINER_USER/.local/share/fish:rw
+
+volumes:
+  fish_config:
+  fish_data:

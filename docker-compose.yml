@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  mori_echo_py:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    init: true
+    restart: "no"
+    ports:
+      - 31218:31218
