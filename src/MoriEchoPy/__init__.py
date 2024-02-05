@@ -1,5 +1,11 @@
-from MoriEchoPy.server import run_server
+from MoriEchoPy.Logging import general as Logger
+from MoriEchoPy.Server import MoriEchoServer
 
 
-def main():
-    run_server()
+def main() -> None:
+    Logger.info("MoriEchoPy TCP Echo Server started.")
+
+    server = MoriEchoServer(address="localhost", port=31216)
+    server.run()
+
+    Logger.info("MoriEchoPy TCP Echo Server exiting...")
