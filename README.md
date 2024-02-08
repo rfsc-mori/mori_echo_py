@@ -4,7 +4,7 @@ A python port of [MoriEcho](https://github.com/rfsc-mori/mori_echo).
 
 ## Server plan:
 
-- [ ] Provides a TCP server capable of asynchronous processing
+- [x] Provides a TCP server capable of asynchronous processing
 - [ ] Validates messages as efficiently as possible
 - [ ] Rejects invalid messages and attempts to fail fast
 - [ ] Requires user authentication before echoing
