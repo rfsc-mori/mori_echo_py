@@ -30,7 +30,7 @@ class MoriEchoServer:
 
         self.__sessions.clear()
 
-    def stop(self, _signal_number: int, _frame: Optional[FrameType]) -> None:
+    def stop(self) -> None:
         self.__running = False
 
         self.__listen_socket.close()
@@ -53,8 +53,8 @@ class MoriEchoServer:
             self.session = session
 
     def __init__(self, address: str, port: int) -> None:
-        signal.signal(signal.SIGINT, self.stop)
-        signal.signal(signal.SIGTERM, self.stop)
+        signal.signal(signal.SIGINT, self.__stop_handler)
+        signal.signal(signal.SIGTERM, self.__stop_handler)
 
         self.__listen_socket = socket.socket()
         self.__listen_socket.bind((address, port))
@@ -74,6 +74,9 @@ class MoriEchoServer:
             "Listening on port %(port)d",
             {"port": self.__listen_socket.getsockname()[1]},
         )
+
+    def __stop_handler(self, _signal_number: int, _frame: Optional[FrameType]) -> None:
+        self.stop()
 
     def __accept(self, listen_socket: socket.socket, _event_data: __EventData) -> None:
         client, _addr = listen_socket.accept()
