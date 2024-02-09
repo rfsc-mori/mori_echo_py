@@ -1,6 +1,7 @@
 import selectors
 import signal
 import socket
+import threading
 from types import FrameType
 from uuid import UUID
 from MoriEchoPy.Logging import server as Logger
@@ -9,10 +10,20 @@ from typing import cast, Callable, Optional, Self
 
 
 class MoriEchoServer:
-    def run(self) -> None:
-        self.__running = True
+    __stop_event: Optional[threading.Event]
 
-        while self.__running:
+    __sessions: dict[UUID, MoriEchoSession]
+
+    __listen_socket: socket.socket
+    __selector: selectors.DefaultSelector
+
+    def run(self, stop_event: Optional[threading.Event] = None) -> None:
+        if stop_event:
+            self.__stop_event = stop_event
+        else:
+            self.__stop_event = threading.Event()
+
+        while not self.__stop_event.is_set():
             try:
                 events = self.__selector.select()
             except OSError as e:
@@ -30,10 +41,11 @@ class MoriEchoServer:
 
         self.__sessions.clear()
 
-    def stop(self) -> None:
-        self.__running = False
+    def shutdown(self) -> None:
+        if self.__stop_event:
+            self.__stop_event.set()
 
-        self.__listen_socket.close()
+        self.__listen_socket.shutdown(socket.SHUT_RDWR)
         self.__selector.close()
 
     class __EventData:
@@ -66,9 +78,9 @@ class MoriEchoServer:
             self.__listen_socket, selectors.EVENT_READ, self.__EventData(self.__accept)
         )
 
-        self.__running = False
+        self.__stop_event = None
 
-        self.__sessions: dict[UUID, MoriEchoSession] = {}
+        self.__sessions = {}
 
         Logger.info(
             "Listening on port %(port)d",
@@ -76,9 +88,12 @@ class MoriEchoServer:
         )
 
     def __stop_handler(self, _signal_number: int, _frame: Optional[FrameType]) -> None:
-        self.stop()
+        self.shutdown()
 
     def __accept(self, listen_socket: socket.socket, _event_data: __EventData) -> None:
+        if self.__stop_event and self.__stop_event.is_set():
+            return
+
         client, _addr = listen_socket.accept()
         client.setblocking(False)
 
@@ -97,6 +112,9 @@ class MoriEchoServer:
         )
 
     def __read(self, client: socket.socket, event_data: __ClientData) -> None:
+        if self.__stop_event and self.__stop_event.is_set():
+            return
+
         try:
             client_data = client.recv(1000)
 
